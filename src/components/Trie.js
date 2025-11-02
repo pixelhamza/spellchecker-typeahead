@@ -19,6 +19,16 @@ export class Trie {
     node.isEnd = true;
   }
 
+  contains(word) {
+    if (!word) return false;
+    let node = this.root;
+    for (const ch of word.toLowerCase()) {
+      if (!node.children[ch]) return false;
+      node = node.children[ch];
+    }
+    return !!node.isEnd;
+  }
+
   getSuggestions(prefix, limit = 3) {
     let node = this.root;
     for (const ch of prefix.toLowerCase()) {

@@ -33,17 +33,38 @@ export default function TextEditor() {
   const start = input.selectionStart;
   const end = input.selectionEnd;
 
-  const words = value.split(/\s+/);
-  const last = words[words.length - 1];
+   // Determine trailing separators and the last complete token before them
+   const trailingMatch = value.match(/[\s.,!?]+$/);
+   const trailing = trailingMatch ? trailingMatch[0] : "";
+   const core = trailing ? value.slice(0, value.length - trailing.length) : value;
+   const words = core.split(/\s+/);
+   const last = words[words.length - 1] || "";
 
   
   if (last.length > 2) {
     const lastChar = value.slice(-1);
    
     if (/\s|[.,!?]/.test(lastChar)) {
-      const corrected = getCorrection(last);
+      // Provide dictionary lookup to spell checker and preserve capitalization
+      const corrected = getCorrection(last, (w) => trie.contains(w));
       if (corrected !== last) {
-        value = value.replace(new RegExp(last + "$"), corrected);
+        const delta = corrected.length - last.length;
+        const newCore = core.slice(0, core.length - last.length) + corrected;
+        value = newCore + trailing;
+
+        // Adjust caret if it was at end or inside trailing
+        if (textareaRef.current) {
+          if (start >= core.length) {
+            // caret was at or beyond end of core (i.e., before/inside trailing)
+            const newStart = start + delta;
+            const newEnd = end + delta;
+            requestAnimationFrame(() => {
+              if (textareaRef.current) {
+                textareaRef.current.setSelectionRange(newStart, newEnd);
+              }
+            });
+          }
+        }
       }
     }
 
@@ -55,10 +76,16 @@ export default function TextEditor() {
 
   setText(value);
 
-
+  // If we didn't already adjust the caret due to a correction, keep it as-is
   requestAnimationFrame(() => {
     if (textareaRef.current) {
-      textareaRef.current.setSelectionRange(start, end);
+      // Do not override if we already moved the selection in the correction branch
+      // We detect this heuristically: if selection currently equals start/end, set it.
+      const selStart = textareaRef.current.selectionStart;
+      const selEnd = textareaRef.current.selectionEnd;
+      if (selStart === selEnd && selStart === start) {
+        textareaRef.current.setSelectionRange(start, end);
+      }
     }
   });
 }
