@@ -1,70 +1,69 @@
-# Getting Started with Create React App
+# A Text Editor which implements String Algorithmns like KMP,Trie Typeahead and mini spellchecker 
+This **minimal text editor** is made on **react**  and demonstrates classical algorithms in a modern web app 
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+It features : 
+- **KMP-based pattern searche** (fast substring highighting with a TIME COMPLEXITY od O(m+n)
+- **Trie based typeahead suggestions** (autocomplete)
+- **Spellchecker/autocorrect** for the 200 most commonly mistyped words
 
-## Available Scripts
+This project is modular,educational, and easily extendable. 
 
-In the project directory, you can run:
+## Features
 
-### `npm start`
+1. **Real-time KMP Search**  
+   Highlight all occurrences of a search pattern in the text using the **Knuth-Morris-Pratt (KMP)** algorithm.  
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+   The KMP algorithm preprocesses the pattern to build a **Longest Prefix Suffix (LPS)** array:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+   $$ 
+   LPS[i] = \text{length of the longest proper prefix of } pattern[0..i] \text{ which is also a suffix} 
+   $$
 
-### `npm test`
+   Search runs in \(O(n + m)\) time, where \(n\) is the text length and \(m\) is the pattern length.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+2. **Trie Typeahead**  
+   Provides **prefix-based suggestions** in real time.  
 
-### `npm run build`
+   - Stores words in a **prefix tree (Trie)**.
+   - Retrieves top 3 suggestions for the current prefix.
+   - Prompts: *“Do you want to type this?”*
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+   Conceptually, a Trie is defined recursively:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+  
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+3. **Spellchecker / Autocorrect**  
+   Corrects common misspellings using a **hardcoded dictionary of 100 words**.  
+   Uses **Levenshtein distance**  to correct words
 
-### `npm run eject`
+## How to Run
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Follow these steps to get the **React Text Editor** up and running locally:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### 1. Clone the Repository
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```
+git clone https://github.com/pixelhamza/smart-text-editor
+cd react-text-editor
+```
+### 2. Install dependencies
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```
+npm install
+```
 
-## Learn More
+### 3. Start Server 
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```
+npm start
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```
 
-### Code Splitting
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
-### Analyzing the Bundle Size
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
 
-### Making a Progressive Web App
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
 
-### Advanced Configuration
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
 
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
