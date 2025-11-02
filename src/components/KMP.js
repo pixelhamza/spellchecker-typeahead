@@ -1,4 +1,4 @@
-// KMP.js - Knuth-Morris-Pratt substring search algorithm
+
 
 export function buildLPS(pattern) {
   const lps = Array(pattern.length).fill(0);

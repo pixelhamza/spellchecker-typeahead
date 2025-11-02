@@ -11,37 +11,61 @@ export default function TextEditor() {
   const [suggestions, setSuggestions] = useState([]);
 
   const editorRef = useRef(null);
+  const textareaRef = useRef(null);
+
   const trie = useRef(new Trie()).current;
 
-  // preload some words
-  useEffect(() => {
-    ["apple", "application", "appetite", "banana", "band", "banner", "cat", "cater", "catalog"].forEach(w => trie.insert(w));
-  }, [trie]);
+ 
+ useEffect(() => {
+  fetch("/words.txt")
+    .then((res) => res.text())
+    .then((data) => {
+      const words = data.split("\n");
+      words.forEach((word) => trie.insert(word));
+    });
+}, [trie]);
 
-  // --- Spellcheck autocorrect ---
-  function handleTextChange(e) {
-    let value = e.target.value;
 
-    // check last word
-    const words = value.split(/\s+/);
-    const last = words[words.length - 1];
+ function handleTextChange(e) {
+  const input = e.target;
+  let value = input.value;
 
-    if (last.length > 2) {
+  const start = input.selectionStart;
+  const end = input.selectionEnd;
+
+  const words = value.split(/\s+/);
+  const last = words[words.length - 1];
+
+  
+  if (last.length > 2) {
+    const lastChar = value.slice(-1);
+   
+    if (/\s|[.,!?]/.test(lastChar)) {
       const corrected = getCorrection(last);
       if (corrected !== last) {
         value = value.replace(new RegExp(last + "$"), corrected);
       }
-
-      const sug = trie.getSuggestions(last, 3);
-      setSuggestions(sug);
-    } else {
-      setSuggestions([]);
     }
 
-    setText(value);
+    const sug = trie.getSuggestions(last, 3);
+    setSuggestions(sug);
+  } else {
+    setSuggestions([]);
   }
 
-  // --- KMP search update ---
+  setText(value);
+
+
+  requestAnimationFrame(() => {
+    if (textareaRef.current) {
+      textareaRef.current.setSelectionRange(start, end);
+    }
+  });
+}
+
+
+
+  
   useEffect(() => {
     if (!pattern.trim()) {
       setMatches([]);
@@ -53,7 +77,7 @@ export default function TextEditor() {
     setCurrent(m.length ? 0 : -1);
   }, [text, pattern]);
 
-  // --- Highlighting ---
+ 
   function highlightText() {
     if (!matches.length) return escapeHtml(text);
     let out = "", last = 0;
@@ -87,11 +111,12 @@ export default function TextEditor() {
 
       <div style={styles.toolbar}>
         <textarea
-          style={styles.textarea}
-          value={text}
-          onChange={handleTextChange}
-          placeholder="Type text..."
-        />
+            ref={textareaRef}       
+            style={styles.textarea}
+            value={text}
+            onChange={handleTextChange}
+            placeholder="Type text..."
+            />
 
         <div style={styles.controls}>
           <input
@@ -134,13 +159,116 @@ export default function TextEditor() {
   );
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 const styles = {
-  container: { fontFamily: "system-ui, sans-serif", maxWidth: "900px", margin: "20px auto" },
-  toolbar: { display: "flex", gap: "10px", alignItems: "flex-start", marginBottom: "12px" },
-  textarea: { flex: 1, minHeight: "220px", borderRadius: "8px", border: "1px solid #ddd", padding: "10px", fontFamily: "monospace" },
-  controls: { width: "260px", display: "flex", flexDirection: "column", position: "relative" },
-  input: { padding: "8px", border: "1px solid #ddd", borderRadius: "6px" },
-  preview: { background: "white", border: "1px solid #ddd", borderRadius: "8px", padding: "12px", whiteSpace: "pre-wrap", overflow: "auto", minHeight: "180px" },
-  suggestions: { position: "absolute", top: "90px", left: "0", background: "#fff", border: "1px solid #ddd", borderRadius: "6px", padding: "4px", width: "100%" },
-  suggestionItem: { padding: "6px 8px", cursor: "pointer" }
+  container: {
+    fontFamily: "system-ui, sans-serif",
+    maxWidth: "900px",
+    margin: "30px auto",
+    padding: "20px",
+    background: "#f5f7fa",       
+    borderRadius: "10px",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.08)"
+  },
+  toolbar: {
+    display: "flex",
+    gap: "15px",
+    alignItems: "flex-start",
+    marginBottom: "15px"
+  },
+  textarea: {
+    flex: 1,
+    minHeight: "220px",
+    borderRadius: "8px",
+    border: "1px solid #cfd3d9",    
+    padding: "12px",
+    fontFamily: "monospace",
+    fontSize: "14px",
+    lineHeight: "1.5",
+    resize: "vertical",
+    background: "#ffffff"            
+  },
+  controls: {
+    width: "260px",
+    display: "flex",
+    flexDirection: "column",
+    position: "relative"
+  },
+  input: {
+    padding: "8px",
+    border: "1px solid #cfd3d9",
+    borderRadius: "6px",
+    marginBottom: "10px",
+    fontSize: "14px",
+    background: "#fff"
+  },
+  preview: {
+    background: "#ffffff",
+    border: "1px solid #cfd3d9",
+    borderRadius: "8px",
+    padding: "12px",
+    whiteSpace: "pre-wrap",
+    overflow: "auto",
+    minHeight: "180px",
+    fontFamily: "monospace",
+    fontSize: "14px",
+    lineHeight: "1.5"
+  },
+  suggestions: {
+    position: "absolute",
+    top: "50px",
+    left: "0",
+    background: "#ffffff",
+    border: "1px solid #cfd3d9",
+    borderRadius: "6px",
+    padding: "4px",
+    width: "100%",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
+    zIndex: 10
+  },
+  suggestionItem: {
+    padding: "6px 8px",
+    cursor: "pointer",
+    borderRadius: "4px",
+    transition: "background 0.2s",
+    color: "#333"                   
+  },
+  toolbarButtons: {
+    display: "flex",
+    gap: "6px",
+    marginBottom: "6px"
+  },
+  matchesInfo: {
+    color: "#555",
+    fontSize: "12px",
+    marginTop: "6px"
+  },
+  markHighlight: {
+    background: "#ffeaa7",          
+    borderRadius: "2px"
+  },
+  button: {
+    padding: "6px 10px",
+    borderRadius: "5px",
+    border: "1px solid #74b9ff",
+    background: "#0984e3",
+    color: "#fff",
+    cursor: "pointer",
+    transition: "background 0.2s"
+  },
+  buttonHover: {
+    background: "#74b9ff"
+  }
 };

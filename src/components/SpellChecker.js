@@ -8,7 +8,7 @@ const commonWords = [
   "preferred","principal","privilege","probably","professional","publicly","really","receive","recommend","referred",
   "relevant","religious","remember","resistance","restaurant","rhythm","schedule","separate","sergeant","similar",
   "successful","supersede","surprise","tomorrow","tremendous","truly","unfortunately","until","vacuum","village",
-  "weather","weird","whether","writing","yacht","yourself","across","against","although","among"
+  "weather","weird","whether","writing","yacht","yourself","across","against","although","among","algorithm","hello","free","love"
 ];
 
 export function getCorrection(word) {
@@ -16,7 +16,7 @@ export function getCorrection(word) {
   word = word.toLowerCase();
   if (commonWords.includes(word)) return word;
 
-  // very naive correction: find word with smallest Levenshtein distance <= 2
+
   let best = word;
   let bestDist = 3;
 
