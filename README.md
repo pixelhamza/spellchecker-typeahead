@@ -43,7 +43,7 @@ Follow these steps to get the **React Text Editor** up and running locally:
 ### 1. Clone the Repository
 
 ```
-git clone https://github.com/pixelhamza/smart-text-editor
+git clone https://github.com/pixelhamza/spellchecker-typeahead
 cd react-text-editor
 ```
 ### 2. Install dependencies
